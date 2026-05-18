@@ -3,7 +3,7 @@ import gradio as gr
 from huggingface_hub import InferenceClient
 
 HF_TOKEN = os.environ.get("HFTOKEN")
-client = InferenceClient(model="mistralai/Mistral-7B-Instruct-v0.2", token=HF_TOKEN)
+client = InferenceClient(model="HuggingFaceH4/zephyr-7b-beta", token=HF_TOKEN)
 
 EXAMPLES = [
     "Create a FastAPI POST endpoint at /users that accepts name and email, validates both fields are non-empty, and returns a JSON response with a generated user ID.",
@@ -18,13 +18,13 @@ EXAMPLES = [
 def generate(instruction, max_new_tokens=350):
     if not instruction.strip():
         return "Please enter an instruction."
-    prompt = f"[INST] {instruction} [/INST]"
+    prompt = f"<|system|>\nYou are a backend API code generator. Write clean, working code only.</s>\n<|user|>\n{instruction}</s>\n<|assistant|>\n"
     try:
         response = client.text_generation(
             prompt,
             max_new_tokens=max_new_tokens,
             temperature=0.2,
-            stop_sequences=["[INST]", "</s>"],
+            stop_sequences=["<|user|>", "</s>"],
         )
         return response.strip()
     except Exception as e:
