@@ -38,6 +38,8 @@ def generate(instruction, max_new_tokens=350):
             timeout=30,
         )
         result = resp.json()
+        if "choices" not in result:
+            return f"API error: {result}"
         return result["choices"][0]["message"]["content"].strip()
     except Exception as e:
         return f"Error: {str(e)}"
