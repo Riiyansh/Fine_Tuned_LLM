@@ -3,7 +3,7 @@ import json
 import requests
 import gradio as gr
 
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+GROQ_API_KEY = "".join(c for c in os.environ.get("GROQ_API_KEY", "") if ord(c) < 128).strip()
 
 EXAMPLES = [
     "Create a FastAPI POST endpoint at /users that accepts name and email, validates both fields are non-empty, and returns a JSON response with a generated user ID.",
