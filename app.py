@@ -1,8 +1,9 @@
 import os
+import json
+import requests
 import gradio as gr
-from groq import Groq
 
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 EXAMPLES = [
     "Create a FastAPI POST endpoint at /users that accepts name and email, validates both fields are non-empty, and returns a JSON response with a generated user ID.",
@@ -19,16 +20,25 @@ def generate(instruction, max_new_tokens=350):
         return "Please enter an instruction."
     instruction = "".join(c for c in instruction if ord(c) < 128).strip()
     try:
-        completion = client.chat.completions.create(
-            model="llama3-8b-8192",
-            messages=[
-                {"role": "system", "content": "You are a backend API code generator. Write clean, working code only. Return code without explanation."},
-                {"role": "user", "content": instruction},
-            ],
-            max_tokens=max_new_tokens,
-            temperature=0.2,
+        resp = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            data=json.dumps({
+                "model": "llama3-8b-8192",
+                "messages": [
+                    {"role": "system", "content": "You are a backend API code generator. Write clean, working code only. Return code without explanation."},
+                    {"role": "user", "content": instruction},
+                ],
+                "max_tokens": max_new_tokens,
+                "temperature": 0.2,
+            }).encode("utf-8"),
+            timeout=30,
         )
-        return completion.choices[0].message.content.strip()
+        result = resp.json()
+        return result["choices"][0]["message"]["content"].strip()
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -38,7 +48,7 @@ with gr.Blocks(title="Mistral-7B API CodeGen", theme=gr.themes.Monochrome()) as 
         """
         # Mistral-7B: API & Backend Code Generation
         Fine-tuned on 952 API/backend code generation examples using **QLoRA** (LoRA rank 16, 3 epochs).
-        Training loss: **0.66 → 0.37** | Trainable params: **41.9M / 7.28B (0.58%)**
+        Training loss: **0.66 -> 0.37** | Trainable params: **41.9M / 7.28B (0.58%)**
 
         Fine-tuned adapter: [Riyanshc/mistral-api-codegen](https://huggingface.co/Riyanshc/mistral-api-codegen)
         """
@@ -57,7 +67,7 @@ with gr.Blocks(title="Mistral-7B API CodeGen", theme=gr.themes.Monochrome()) as 
     gr.Examples(
         examples=EXAMPLES,
         inputs=instruction_box,
-        label="Example prompts — click to load",
+        label="Example prompts -- click to load",
     )
 
     generate_btn.click(fn=generate, inputs=instruction_box, outputs=output)
