@@ -27,7 +27,7 @@ def generate(instruction, max_new_tokens=350):
                 "Content-Type": "application/json",
             },
             data=json.dumps({
-                "model": "llama3-8b-8192",
+                "model": "llama-3.1-8b-instant",
                 "messages": [
                     {"role": "system", "content": "You are a backend API code generator. Write clean, working code only. Return code without explanation."},
                     {"role": "user", "content": instruction},
