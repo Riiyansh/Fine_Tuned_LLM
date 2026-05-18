@@ -17,6 +17,7 @@ EXAMPLES = [
 def generate(instruction, max_new_tokens=350):
     if not instruction.strip():
         return "Please enter an instruction."
+    instruction = instruction.encode("ascii", "ignore").decode("ascii").strip()
     try:
         completion = client.chat.completions.create(
             model="llama3-8b-8192",
