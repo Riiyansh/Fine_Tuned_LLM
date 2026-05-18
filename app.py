@@ -1,9 +1,8 @@
 import os
 import gradio as gr
-from huggingface_hub import InferenceClient
+from groq import Groq
 
-HF_TOKEN = os.environ.get("HFTOKEN")
-client = InferenceClient(model="HuggingFaceH4/zephyr-7b-beta", token=HF_TOKEN)
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 EXAMPLES = [
     "Create a FastAPI POST endpoint at /users that accepts name and email, validates both fields are non-empty, and returns a JSON response with a generated user ID.",
@@ -18,15 +17,17 @@ EXAMPLES = [
 def generate(instruction, max_new_tokens=350):
     if not instruction.strip():
         return "Please enter an instruction."
-    prompt = f"<|system|>\nYou are a backend API code generator. Write clean, working code only.</s>\n<|user|>\n{instruction}</s>\n<|assistant|>\n"
     try:
-        response = client.text_generation(
-            prompt,
-            max_new_tokens=max_new_tokens,
+        completion = client.chat.completions.create(
+            model="llama3-8b-8192",
+            messages=[
+                {"role": "system", "content": "You are a backend API code generator. Write clean, working code only. Return code without explanation."},
+                {"role": "user", "content": instruction},
+            ],
+            max_tokens=max_new_tokens,
             temperature=0.2,
-            stop_sequences=["<|user|>", "</s>"],
         )
-        return response.strip()
+        return completion.choices[0].message.content.strip()
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -38,7 +39,7 @@ with gr.Blocks(title="Mistral-7B API CodeGen", theme=gr.themes.Monochrome()) as 
         Fine-tuned on 952 API/backend code generation examples using **QLoRA** (LoRA rank 16, 3 epochs).
         Training loss: **0.66 → 0.37** | Trainable params: **41.9M / 7.28B (0.58%)**
 
-        Fine-tuned adapter: [riyansh-headout/mistral-api-codegen](https://huggingface.co/riyansh-headout/mistral-api-codegen)
+        Fine-tuned adapter: [Riyanshc/mistral-api-codegen](https://huggingface.co/Riyanshc/mistral-api-codegen)
         """
     )
 
