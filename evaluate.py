@@ -11,7 +11,7 @@ from peft import PeftModel
 from rouge_score import rouge_scorer
 
 BASE_MODEL_ID = "mistralai/Mistral-7B-v0.1"
-FINETUNED_MODEL_ID = "your-hf-username/mistral-api-codegen"  # <-- change this
+FINETUNED_MODEL_ID = "Riyanshc/mistral-api-codegen"
 
 # Hand-crafted evaluation prompts covering different API patterns
 EVAL_PROMPTS = [
