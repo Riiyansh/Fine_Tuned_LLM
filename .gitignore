@@ -1,0 +1,36 @@
+# Model checkpoints and outputs
+mistral-api-codegen-checkpoints/
+mistral-api-codegen-final/
+*.bin
+*.safetensors
+*.pt
+*.pth
+
+# Evaluation and data outputs
+evaluation_results.json
+test_samples.json
+*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Secrets / tokens — never commit these
+.env
+.env.*
+secrets.json
+hf_token.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter / Kaggle notebooks if downloaded
+*.ipynb_checkpoints/
