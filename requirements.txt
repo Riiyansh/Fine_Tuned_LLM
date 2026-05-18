@@ -1,1 +1,2 @@
 audioop-lts
+huggingface_hub>=0.20.0,<0.25.0
